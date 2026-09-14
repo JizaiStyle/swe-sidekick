@@ -1,0 +1,1 @@
+task_id,mode,starting_commit,acceptance_met,independent_tests_passed,lead_review_minutes,total_minutes,codex_usage_before,codex_usage_after,devin_usage_before,devin_usage_after,worker_turns,observed_devin_model,notes

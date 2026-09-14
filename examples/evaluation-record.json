@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "task_id": "REPLACE_WITH_TASK_ID",
+  "acceptance_met": null,
+  "independent_tests_passed": null,
+  "post_apply_tests_passed": null,
+  "lead_review_minutes": null,
+  "total_minutes": null,
+  "codex_usage_before": null,
+  "codex_usage_after": null,
+  "devin_usage_before": null,
+  "devin_usage_after": null,
+  "parent_model": null,
+  "parent_effort": null,
+  "parent_model_evidence": null,
+  "observed_total_cost_usd": null,
+  "cost_evidence": null,
+  "notes": null
+}

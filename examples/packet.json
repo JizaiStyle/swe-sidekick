@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "objective": "src/add.py の add(a, b) が差ではなく和を返すよう修正する。",
+  "allowed_changes": ["src/add.py"],
+  "acceptance_criteria": ["add(2, 3) が 5 を返す", "既存の関数名と引数を変えない"],
+  "non_goals": ["テスト内容の変更", "依存追加・外部API呼出・設計変更"],
+  "verification": [["python3", "-m", "unittest", "discover", "-s", "tests", "-v"]]
+}
