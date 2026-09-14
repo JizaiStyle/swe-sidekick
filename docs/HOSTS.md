@@ -5,6 +5,11 @@ only a bounded implementation task to the explicitly configured SWE-2 worker.
 The lead can be a Codex host or a Devin host running a user-selected lead
 model, including Fable. The skill does not choose or change that model.
 
+The lead also keeps the effort selected in its host. Use the host's reasoning
+control (`/effort` only where supported); command availability varies. Worker
+effort is configured independently through an exact SWE-2 catalog value and is
+not inherited from the lead. See the [cheat sheet](CHEATSHEET.md) for quick steps.
+
 Invoke the skill explicitly in the host where the lead is running:
 
 | Lead host | Invocation | Lead model selection |

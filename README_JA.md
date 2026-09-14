@@ -1,5 +1,7 @@
 # SWE Sidekick
 
+[チートシート（英語）](docs/CHEATSHEET.md)
+
 **CodexまたはDevin/Fableを親、SWE-2を実装担当にする明示起動型Skill**です。親が計画・レビュー・採否を担当し、範囲を限定した実装を公式Devin CLIへ委譲します。独立したGitスナップショットで作業し、差分の範囲・検証結果・レビュー済みハッシュを確認してから適用します。
 
 Devin標準のFusionとは別の仕組みです。親モデルは現在のセッションで選択したものを使います。macOS/Linux、Python 3.10以上、Git、インストール・ログイン済みのDevin CLIが必要です。
