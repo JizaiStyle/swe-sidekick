@@ -2,7 +2,7 @@
 
 An opt-in skill for a **Codex or Devin/Fable lead** to delegate bounded implementation work to **SWE-2**, using the official Devin CLI. The lead keeps planning, review and acceptance. The wrapper creates an isolated Git snapshot, checks scope, verifies changes and requires an explicitly reviewed patch hash before applying.
 
-[日本語](README_JA.md) · [Host selection and handoff](docs/HOSTS.md) · [Security boundary](SECURITY.md) · [Validation](TEST_REPORT.md)
+[Japanese / 日本語](README_JA.md) · [Host selection and handoff](docs/HOSTS.md) · [Security boundary](SECURITY.md) · [Validation](TEST_REPORT.md)
 
 This is a single-user prototype for trusted repositories on macOS/Linux with Python 3.10+, Git, and an installed, authenticated Devin CLI. It is not native Devin Fusion and does not select the lead model. Live model compatibility, latency, quota savings and cost savings are not established by the offline tests.
 

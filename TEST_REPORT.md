@@ -32,3 +32,14 @@ Discovery confirms loading and metadata, not actual Fable/SWE-2 execution, outpu
 GitHub API checks confirmed that [the repository](https://github.com/JizaiStyle/swe-sidekick) is public and its initial `main` matched the reviewed release commit `68024d1e02e70749bad26fe2c32da4c485e4121c`. The original private development tree and its history were not imported.
 
 Scanning is not a guarantee that arbitrary future task artifacts are safe to publish. Handoff snapshots, evaluation records, prompts and worker logs remain private local data.
+
+## English documentation update (MP-14)
+
+On 2026-09-15, the default evaluation guide, example task text, skill summary
+and security heading were made English. `README_JA.md` remains a labelled
+alternative translation. Review confirmed that task scope, verification argv,
+schema version and the explicit invocation policy were unchanged. The packet
+passed the runtime packet validator; metadata parsing, skill validation,
+relative links, public-language scanning and managed payload rendering passed.
+No runtime code changed, and the earlier full test suite was not rerun for this
+update. Publication and the matching managed installation were refreshed.

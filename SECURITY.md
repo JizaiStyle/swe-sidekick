@@ -1,4 +1,4 @@
-# Security boundary / 安全性の範囲
+# Security boundary
 
 This is an un-audited, single-user prototype for trusted repositories, not a containment system for hostile code.
 
