@@ -25,8 +25,10 @@ Discovery confirms loading and metadata, not actual Fable/SWE-2 execution, outpu
 
 ## Public-tree checks
 
-- Gitleaks 8.30.1 directory scan: no leaks detected. The scanner archive was checked against its published checksum before use.
+- Gitleaks 8.30.1 directory and fresh Git-history scans: no leaks detected. The scanner archive was checked against its published checksum before use.
 - The public file list was inspected for personal absolute paths, private project references, real historical task IDs, raw logs, local state and credential material. None of those were included. Example Git identities are synthetic; publication uses a GitHub noreply commit address.
-- Markdown relative links and canonical skill metadata passed validation. The repository includes an offline GitHub Actions matrix for Python 3.10, 3.12 and 3.14; local results above do not imply that hosted CI has already run.
+- Markdown relative links and canonical skill metadata passed validation. The first [hosted GitHub Actions run](https://github.com/JizaiStyle/swe-sidekick/actions/runs/34909675633) completed successfully on Ubuntu for all three Python versions: 3.10, 3.12 and 3.14. This is separate from the local macOS result above. Subsequent release-evidence-only documentation changes do not change the tested runtime, installer or tests.
+
+GitHub API checks confirmed that [the repository](https://github.com/JizaiStyle/swe-sidekick) is public and its initial `main` matched the reviewed release commit `68024d1e02e70749bad26fe2c32da4c485e4121c`. The original private development tree and its history were not imported.
 
 Scanning is not a guarantee that arbitrary future task artifacts are safe to publish. Handoff snapshots, evaluation records, prompts and worker logs remain private local data.
