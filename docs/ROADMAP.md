@@ -20,7 +20,15 @@ This file is the single source of truth for current progress. Status values are 
 
 | MP-20 | 10 / MP-10 | Complete (local implementation and installation) | Command-scoped gc.auto=0 and maintenance.auto=false prevent deferred Git mutation. SWE-2 High changed CLI helper and two focused tests. Exact metadata tamper checks remain unchanged. | 58-test suite passed; actual large-repository prepare/clean inspection and deliberate info/refs rejection passed. Applied regressions passed, managed runtime installed and byte-matched. Not pushed or published. |
 
+| MP-21 | 11 / MP-19, MP-12 | Complete (local guidance and installation) | Clarified authorization continuity, task-specific worker selection, resumption and actor-labelled updates. Files: `skill/SKILL.md`, master plan and this roadmap. Managed Codex and Devin copies updated. | Canonical and installed Codex skill validation, diff whitespace check and all managed payload byte comparisons passed. No runtime change or paid worker run. Publication is tracked by MP-22. |
+
+| MP-22 | 12 / MP-20, MP-21 | In progress | Preserve the existing plan, runtime-fix and guidance commits; publish them through the current public `main`. Version remains 0.3.0 under the installer's tested same-version refresh path because there is no tagged/package release. | Revalidate changed boundaries, refresh the managed installation, scan the final history, push, pass hosted CI, verify remote HEAD and record release evidence. |
+
 ## Validation record
+
+2026-09-15 — MP-22 started after the user asked for the optimal handling of the unpublished repository state. The release will preserve the two existing commits and commit MP-21 separately. A 0.3.1 installer migration was rejected as unnecessary scope: the project has no tag or packaged release and already tests backed-up same-version upgrades. This decision changes publication status only; MP-20 behavior and MP-21 guidance remain unchanged.
+
+2026-09-15 — MP-21: reviewed continuation, model-selection and external-action boundaries against existing delegation rules. The default Python lacked PyYAML; the cached offline uv environment validated canonical and installed Codex skills successfully. Managed upgrade completed with backup, and every installed payload matched its canonical rendering. This was lead-owned skill documentation work; no SWE run, application change or deployment was performed.
 
 2026-09-15 — MP-10–13 requirements, ownership, dependencies, safety boundaries, and completion conditions were added before implementation. No implementation, installation, model execution, repository publication, or remote mutation is claimed by this entry.
 

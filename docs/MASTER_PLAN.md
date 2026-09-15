@@ -86,3 +86,11 @@ The release is complete only when every requirement's completion condition is su
 ## MP-20: Stable private Git preparation
 
 Prevent Git automatic background maintenance initiated by sidekick-controlled Git calls from modifying private scratch metadata after its baseline is captured. Preserve the existing exact metadata tamper check, sanitized environment, global Git settings, worker sandbox, model/session checks and source cleanliness. Use command-scoped Git configuration only; do not ignore metadata files or rewrite task baselines. Completion requires a focused regression reproducing asynchronous maintenance risk and proving unexpected metadata mutations still fail scope inspection. SWE-2 High owns swe_sidekick.py and tests/test_sidekick.py; lead owns plans, review and isolated large-repository acceptance.
+
+## MP-21: Preserve delegation intent across continuation
+
+Clarify how the skill carries existing authorization and task-specific worker choices across follow-up turns, distinguishes lead tools from actual worker execution, and avoids redundant investigation. Scope is skill guidance and these planning documents only; no runtime, global model setting, task-state change or publication. The lead owns this documentation-only update. Completion requires focused skill validation, review of the instruction boundaries, and managed installation with rendered-content verification.
+
+## MP-22: Publish the verified follow-up changes
+
+Publish the already reviewed MP-20 runtime fix and MP-21 guidance to the existing public `main` without rewriting their commits or importing unrelated history. Keep version 0.3.0 because this repository has no tagged or packaged release and the managed installer explicitly supports backed-up same-version refreshes; a version migration would expand the installer compatibility surface without improving this update. Scope includes focused validation, the MP-21 documentation commit, managed installation refresh, secret scanning, hosted CI, remote-HEAD verification and final roadmap evidence. It excludes new runtime behavior, model execution, task-state changes and unrelated repository cleanup. Completion requires the public remote HEAD and installed managed payloads to match the reviewed source, with MP-20 and MP-21 marked published.

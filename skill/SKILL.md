@@ -39,7 +39,10 @@ paths.
 
 1. Confirm that the user authorized delegating this repository and task to
    Devin. Source code and prompts are sent to the Devin service. Use only a
-   trusted repository.
+   trusted repository. Reuse authorization already established in the current
+   conversation; a continuation or bounded repair within that scope does not
+   require asking again. A skill-only edit is lead documentation work and does
+   not itself authorize a paid worker run or resuming application deployment.
 2. Run `doctor`. Stop if the configured Devin login, worker model, or required
    flags are unavailable. Configure one exact effort-specific SWE-2 catalog
    value with `configure --model ... --acknowledge-usage`; do not select
@@ -50,6 +53,10 @@ paths.
    instructions, review and necessary acceptance on the lead. Read only enough
    to define an executable packet, then start the worker promptly. Use one
    worker and no parallel worker runs unless the user changes that boundary.
+   Resolve task-specific worker instructions against general agent defaults
+   using instruction priority and the user's latest applicable direction.
+   Never silently substitute native Codex subagents for the requested SWE-2
+   worker or claim that a preferred model is active without runtime evidence.
 4. Run `git status` and inspect the project `AGENTS.md`. A clean source is
    required. Never automatically stash, reset, delete, stage, or commit the
    user's work.
@@ -75,11 +82,18 @@ paths.
   investigation or code, add filler tasks, or repeatedly inspect unchanged
   status/logs. Reuse valid checks; run additional tests for changed boundaries,
   failures or unresolved acceptance risks.
+  After an interruption, recover the existing task and its next unmet
+  acceptance criterion instead of restarting broad repository discovery.
 - Announce “SWE-2 <effort> started” only when invoking `run` or `retry`, with the
   task's purpose. Distinguish preparation, execution, completion and acceptance.
   Python/SSH commands used by the lead are not SWE execution. Report the actual
   outcome, changed files and remaining issues concisely; expand logs only when
   needed to investigate failure. Do not claim token or cost savings without data.
+  For mixed workflows, label updates with the actual actor and purpose, for
+  example: "Lead: preparing the packet", "SWE-2 High: implementing the scoped
+  fix", or "Lead: SSH acceptance check". Use the configured effort, not the
+  example's effort. If no worker ran, say so; a Python/SSH tool label alone
+  provides no evidence of SWE delegation.
 
 ## Execution and review
 
@@ -125,8 +139,10 @@ apply --task <id> --reviewed-sha256 <hash-of-the-reviewed-current-patch>
 Never add `--acknowledge-unverified-model` automatically. If export metadata
 does not verify the exact SWE-2 model and effort, the user must check Devin
 session statistics before making that explicit exception. Re-run relevant
-checks in the original repository after applying. Do not commit, push, deploy,
-publish, or send messages automatically.
+checks in the original repository after applying. Commit, push, deploy,
+publish or send messages only within the user's explicit authorization;
+preserve existing authorization without treating skill invocation itself as
+permission for those actions.
 
 ## Sequential handoff between lead hosts
 
