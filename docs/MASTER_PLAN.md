@@ -82,3 +82,7 @@ Shared interfaces are fixed before integration. Contributors must not overwrite 
 ## Completion and evidence
 
 The release is complete only when every requirement's completion condition is supported by a current test or inspection result, the installed files match the released source, the public remote HEAD matches the reviewed local HEAD, and [ROADMAP.md](ROADMAP.md) records changed files, validation evidence, remaining issues, and the update date. A successful skill discovery check is not evidence that a real Codex, Fable, or SWE-2 model ran.
+
+## MP-20: Stable private Git preparation
+
+Prevent Git automatic background maintenance initiated by sidekick-controlled Git calls from modifying private scratch metadata after its baseline is captured. Preserve the existing exact metadata tamper check, sanitized environment, global Git settings, worker sandbox, model/session checks and source cleanliness. Use command-scoped Git configuration only; do not ignore metadata files or rewrite task baselines. Completion requires a focused regression reproducing asynchronous maintenance risk and proving unexpected metadata mutations still fail scope inspection. SWE-2 High owns swe_sidekick.py and tests/test_sidekick.py; lead owns plans, review and isolated large-repository acceptance.

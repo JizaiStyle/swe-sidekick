@@ -18,6 +18,8 @@ This file is the single source of truth for current progress. Status values are 
 | MP-18 | 8 / MP-16, MP-17 | Complete | CLI/installer version 0.3.0, skill workflow, English/Japanese usage, cheat sheet, evaluation protocol, security notes and tests are published. The 86-test local suite, current-rollout schema smoke, CLI help, skill validation, links, privacy/secret scans, managed upgrade, manifest hashes, native discovery and hosted Python 3.10/3.12/3.14 matrix passed. | No release work remains. A matched real-task pair is the next operational measurement, not a missing release artifact. Evidence: [TEST_REPORT.md](../TEST_REPORT.md). |
 | MP-19 | 9 / MP-10, MP-12 | Complete | Delegate implementation/repairs promptly; lead owns direction/review/necessary acceptance, with direct implementation only by explicit user direction. Distinguish worker starts, preparation and lead tools. The guidance is published with v0.3.0; canonical and installed host renderings passed validation/discovery. Files: `skill/SKILL.md`, master plan and this roadmap. | No remaining work. |
 
+| MP-20 | 10 / MP-10 | In progress | Stabilize private preparation against command-triggered background Git maintenance. SWE-2 High owns CLI helper and focused regression tests. | Preserve all tamper detection; isolated large-repository prepare/inspect acceptance remains pending. |
+
 ## Validation record
 
 2026-09-15 — MP-10–13 requirements, ownership, dependencies, safety boundaries, and completion conditions were added before implementation. No implementation, installation, model execution, repository publication, or remote mutation is claimed by this entry.
