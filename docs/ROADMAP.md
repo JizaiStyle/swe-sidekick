@@ -1,4 +1,4 @@
-# SWE Sidekick v0.2.0 Roadmap
+# SWE Sidekick Roadmap
 
 Updated: 2026-09-15
 Requirements: [MASTER_PLAN.md](MASTER_PLAN.md)
@@ -13,6 +13,10 @@ This file is the single source of truth for current progress. Status values are 
 | MP-13 | 3 / MP-10–12 | Complete | The separate public tree passed the final 76-test suite, skill validation, link checks, privacy inspection and Gitleaks tree/history scans. [JizaiStyle/swe-sidekick](https://github.com/JizaiStyle/swe-sidekick) was created as a public repository and pushed; GitHub's `main` SHA matched the reviewed local release commit. Files: `README*`, `SECURITY.md`, `TEST_REPORT.md`, `.github/workflows/test.yml`, `.gitignore`, `AGENTS.md`, this roadmap. | No release requirement remains. No real model was executed; live compatibility and performance remain unmeasured. Hosted CI evidence is linked from [TEST_REPORT.md](../TEST_REPORT.md). |
 | MP-14 | 4 / MP-10, MP-13 | Complete | Default public text is English; the Japanese README is explicitly labelled as an alternative. The evaluation guide, example packet, skill summary and headings were reviewed and translated. Files: `README.md`, `SECURITY.md`, `docs/EVALUATION.md`, `examples/packet.json`, `skill/agents/openai.yaml`, plan, roadmap and validation report. | Example schema, unchanged executable fields, metadata, links and language checks passed. The update is published and the managed installation refreshed; runtime behavior is unchanged. Evidence: [TEST_REPORT.md](../TEST_REPORT.md). |
 | MP-15 | 5 / MP-10, MP-14 | Complete | English operator cheat sheet added and linked from both READMEs and the host guide. Files: `docs/CHEATSHEET.md`, `docs/HOSTS.md`, `README*`, plan and roadmap. Lead model/effort and worker configuration are explicitly independent. | Documentation validation passed as recorded below. No runtime, installation or active model setting changed. Remote HEAD is checked at publication. |
+| MP-16 | 6 / MP-10 | Complete | `measure-start` and `measure-stop` bind to the invoking Codex rollout, include the current root turn, retain only counters/metadata in private state, and emit no binding IDs or cumulative baseline. Synthetic and current-rollout checks passed. Files: `sidekick_measurement.py`, `swe_sidekick.py`, tests. | No implementation work remains. The private Codex rollout schema is an explicit compatibility dependency. Evidence: [TEST_REPORT.md](../TEST_REPORT.md). |
+| MP-17 | 7 / MP-16 | Complete | `measurement-report` preserves sanitized observations and calculates per-counter saved values and percentages only for exactly one complete arm of each kind with the same case/model/effort. Missing, duplicate, inconsistent and mismatched evidence is excluded with a reason. Files: measurement module and tests. | A real matched business-task pair is still needed to produce a project-specific savings result. Raw parent counters do not prove weekly-limit or cost effects. |
+| MP-18 | 8 / MP-16, MP-17 | In progress | CLI/installer version 0.3.0, skill workflow, English/Japanese usage, cheat sheet, evaluation protocol, security notes and tests are complete. Full offline suite, current-rollout schema smoke, CLI help, skill validation, links, privacy, managed upgrade, manifest hashes and native Codex/Devin discovery passed. | Scan the final tree/history, publish, pass hosted CI and verify remote HEAD and final installed payloads. |
+| MP-19 | 9 / MP-10, MP-12 | Complete (local and installed) | Delegate implementation/repairs promptly; lead owns direction/review/necessary acceptance, with direct implementation only by explicit user direction. Distinguish worker starts, preparation and lead tools. The canonical and both installed host renderings passed validation/discovery. Files: `skill/SKILL.md`, master plan and this roadmap. | Publish with v0.3.0 and verify the remote copy. |
 
 ## Validation record
 
@@ -31,3 +35,31 @@ This file is the single source of truth for current progress. Status values are 
 2026-09-15 — MP-14: English public documentation and examples completed. Japanese remains only in the labelled alternative README and its language link. This documentation/metadata update uses focused validation; the previous runtime suite was not rerun.
 
 2026-09-15 — MP-15: added the operator cheat sheet after checking the canonical skill, worker launch arguments and installed Devin CLI help. Verified relative links in all six changed documents, eight CLI command/flag interfaces using `--help`, English-only cheat sheet content, absence of private filesystem paths and whitespace integrity. An initial strict ASCII check rejected typographic ellipses; they were normalized and the focused checks passed. Full runtime tests and model inference were not run for this documentation-only change. `/effort` support is explicitly host-dependent rather than asserted universally.
+
+2026-09-15 — MP-16–18 planned after operational review showed that the v0.2
+report measured worker time and outcomes but had no recorded parent tokens in
+14 included tasks. Read-only inspection confirmed that Codex rollout records
+contain the required counters and model/effort metadata, and that environment
+session IDs can bind the invoking host to the correct rollout. The new design
+uses explicit local measurement arms so an observed token count is not
+mislabelled as a counterfactual reduction. Official OpenAI API documentation
+confirms response usage exposes input/output totals and cached-input details;
+it does not establish how a ChatGPT/Codex weekly subscription limit maps to
+these local counters, so that conversion remains outside scope.
+
+2026-09-15 — MP-19 completed locally. Canonical skill and managed Codex/Devin renderings now prioritize SWE implementation over lead-written fixes. A private stable installer snapshot retained existing application payloads to avoid deploying in-progress measurement code. Ownership manifest and byte comparisons passed; no legacy shared-skill duplicate exists. The skill validator initially lacked PyYAML in the selected interpreter; an isolated uv environment supplied it and validation passed. No CLI behavior or global model setting changed, and no paid model was invoked for this skill validation.
+
+2026-09-15 — MP-16–18 implementation validation: the final offline suite passed
+86 tests in 41.949 seconds. A content-free live schema smoke exercised start,
+stop and reporting against the current invoking Codex rollout, then removed its
+temporary state. CLI/report output contained no session/thread/root-turn IDs,
+rollout positions or cumulative baseline. The skill validator, CLI help,
+relative-link scan, privacy scan and installer upgrade preview passed. No
+SWE-2, Fable or additional paid Codex inference was started for validation.
+
+2026-09-15 — MP-18 local installation: the managed 0.2.0 installation upgraded
+to 0.3.0 with a backup. All 20 manifest hashes matched, including the new
+measurement module and installed cheat sheet. Forced Codex discovery returned
+one enabled skill without errors; Devin returned one user-triggered skill
+without warnings/errors. Global model settings and existing task data were not
+changed. Publication remains the only unfinished release step.

@@ -52,6 +52,26 @@ switching the lead; keep it stable during a task or comparison trial.
 
 If the shell cannot find `swe-sidekick`, use `~/.local/bin/swe-sidekick`.
 
+## Measure Codex parent tokens
+
+Use the same non-sensitive case key for one lead-only arm and one Sidekick arm.
+Keep the starting revision, task requirements, acceptance method, lead model
+and lead effort fixed.
+
+| Action | Command |
+| --- | --- |
+| Start lead-only arm | `swe-sidekick measure-start --case CASE --arm lead-only` |
+| Start Sidekick arm | `swe-sidekick measure-start --case CASE --arm sidekick` |
+| Stop either arm | `swe-sidekick measure-stop --trial TRIAL_ID` |
+| Compare the pair | `swe-sidekick measurement-report --case CASE` |
+
+Start before planning and stop after the last acceptance action. The stop
+snapshot excludes later content. The report shows observed parent input,
+cached-input, cache-write-input, output, reasoning-output and total counts plus
+absolute and percentage differences. A pair requires exactly one completed arm
+of each kind with matching model and effort. It does not include worker tokens
+or convert raw counters to subscription quota, weekly limits or cost.
+
 ## CLI reference
 
 Replace uppercase placeholders with actual local values. Keep packet, feedback
@@ -67,6 +87,9 @@ a script to execute without the intervening review.
 | Apply | `swe-sidekick apply --task TASK_ID --reviewed-sha256 REVIEWED_PATCH_SHA256` | Use the current independently reviewed hash and successful verification. |
 | Request a correction | `swe-sidekick retry --task TASK_ID --feedback-file /private/path/feedback.txt` | Review the failure and give bounded feedback; the total turn limit still applies. |
 | Export handoff | `swe-sidekick handoff --task TASK_ID` | Finish active work first; keep the JSON private. |
+| Start token trial | `swe-sidekick measure-start --case CASE --arm {lead-only,sidekick}` | Codex host only; run before planning and keep the case key non-sensitive. |
+| Stop token trial | `swe-sidekick measure-stop --trial TRIAL_ID` | Use the generated ID in the same Codex session after acceptance. |
+| Compare token pair | `swe-sidekick measurement-report --case CASE` | Requires one matched completed arm of each kind; raw parent counters are not quota or cost. |
 
 If exact worker model/effort metadata is unverified, apply requires an additional
 explicit acknowledgement after checking Devin session statistics. Do not add it
@@ -93,4 +116,5 @@ Explicitly run `inspect --task TASK_ID` to initialize that lock, then retry
 handoff. See [host selection and handoff](HOSTS.md) for state-specific limits.
 
 No model inference was used to validate this reference. It documents local CLI
-and skill behavior, not provider-side execution, token savings or quota effects.
+and skill behavior. A real matched pair is still required to establish token
+savings for a task, and the result does not establish provider quota effects.

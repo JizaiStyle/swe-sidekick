@@ -28,7 +28,7 @@ import time
 import unicodedata
 import uuid
 
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 MAX_PACKET = 65536
 MAX_FILE = 20 * 1024 * 1024
 MAX_PROJECT = 128 * 1024 * 1024
@@ -1047,6 +1047,42 @@ def smoke_setup(args):
             "next": "prepare --repo <repo above> --packet <packet above> --trust-repo"}
 
 
+def measure_start(args):
+    """Capture a private content-free baseline from the invoking Codex rollout."""
+    try:
+        from sidekick_measurement import MeasurementError, measure_start as start
+    except ImportError as exc:
+        raise SidekickError(f"Measurement module is unavailable: {exc}") from exc
+    try:
+        return start(state_root(args), args.case, args.arm)
+    except MeasurementError as exc:
+        raise SidekickError(str(exc)) from exc
+
+
+def measure_stop(args):
+    """Capture the latest private Codex counters for a measurement trial."""
+    try:
+        from sidekick_measurement import MeasurementError, measure_stop as stop
+    except ImportError as exc:
+        raise SidekickError(f"Measurement module is unavailable: {exc}") from exc
+    try:
+        return stop(state_root(args), args.trial)
+    except MeasurementError as exc:
+        raise SidekickError(str(exc)) from exc
+
+
+def measurement_report(args):
+    """Report sanitized trials and paired, eligible observations."""
+    try:
+        from sidekick_measurement import MeasurementError, measurement_report as report
+    except ImportError as exc:
+        raise SidekickError(f"Measurement module is unavailable: {exc}") from exc
+    try:
+        return report(state_root(args), args.case)
+    except MeasurementError as exc:
+        raise SidekickError(str(exc)) from exc
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--state-dir", default=str(Path.home() / ".local/state/codex-swe-sidekick"))
@@ -1077,6 +1113,13 @@ def main(argv=None):
     p.add_argument("--replace", action="store_true")
     p = sub.add_parser("evaluation-report", help="Build the task-level evaluation report")
     p.add_argument("--include-smoke", action="store_true")
+    p = sub.add_parser("measure-start", help="Capture a private Codex token baseline; no model call")
+    p.add_argument("--case", required=True)
+    p.add_argument("--arm", choices=("lead-only", "sidekick"), required=True)
+    p = sub.add_parser("measure-stop", help="Capture a private Codex token snapshot; no model call")
+    p.add_argument("--trial", required=True)
+    p = sub.add_parser("measurement-report", help="Report private Codex token observations; no model call")
+    p.add_argument("--case")
     args = parser.parse_args(argv)
     try:
         if args.command == "doctor": result = doctor(args)
@@ -1103,6 +1146,9 @@ def main(argv=None):
             except ImportError as exc:
                 raise SidekickError(f"Evaluation module is unavailable: {exc}") from exc
             result = build_evaluation_report(state_root(args), include_smoke=args.include_smoke)
+        elif args.command == "measure-start": result = measure_start(args)
+        elif args.command == "measure-stop": result = measure_stop(args)
+        elif args.command == "measurement-report": result = measurement_report(args)
         else:
             with locked_task(state_root(args), args.task) as (task, state):
                 result = inspect_task(task, state)

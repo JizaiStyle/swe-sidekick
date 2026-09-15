@@ -45,10 +45,11 @@ paths.
    value with `configure --model ... --acknowledge-usage`; do not select
    Fusion, Adaptive, `nativeFusion`, `swe`, or another fallback. The
    acknowledgment covers possible quota or credit use; never assert zero cost.
-3. Keep short changes and unresolved architecture, security, product, or
-   billing decisions on the lead. Delegate only a bounded implementation task
-   with independently testable acceptance criteria. Start with one worker and
-   no parallel worker runs.
+3. Delegate implementation and repairs to SWE-2 by default, including small
+   fixes. Keep scope, architecture, security/product/billing decisions,
+   instructions, review and necessary acceptance on the lead. Read only enough
+   to define an executable packet, then start the worker promptly. Use one
+   worker and no parallel worker runs unless the user changes that boundary.
 4. Run `git status` and inspect the project `AGENTS.md`. A clean source is
    required. Never automatically stash, reset, delete, stage, or commit the
    user's work.
@@ -60,6 +61,25 @@ paths.
    arrays, not shell strings. Use exact file paths where practical. Never put
    credentials, tokens, production data, task chat, or private benchmark
    material in the packet.
+
+## Lead work and visible delegation
+
+- Do not take over implementation because a fix looks short, a worker attempt
+  fails, or the lead is already investigating. Use an authorized bounded retry
+  or a new scoped task when needed; report blockers without silently writing
+  the replacement. Direct lead implementation requires explicit user direction.
+- Planning/skill documentation, packet preparation, independent review,
+  focused verification and authorized host operations remain lead work. Do not
+  disguise application implementation as temporary Python, shell or SSH scripts.
+- While SWE runs, handle only independent lead work. Do not duplicate its
+  investigation or code, add filler tasks, or repeatedly inspect unchanged
+  status/logs. Reuse valid checks; run additional tests for changed boundaries,
+  failures or unresolved acceptance risks.
+- Announce “SWE-2 <effort> started” only when invoking `run` or `retry`, with the
+  task's purpose. Distinguish preparation, execution, completion and acceptance.
+  Python/SSH commands used by the lead are not SWE execution. Report the actual
+  outcome, changed files and remaining issues concisely; expand logs only when
+  needed to investigate failure. Do not claim token or cost savings without data.
 
 ## Execution and review
 
@@ -190,6 +210,42 @@ start and completion, preserve the record outside the source repository and
 keep raw trajectories and logs private. This workflow does not invoke or
 measure Devin's native Fusion product, and its local records must not be
 presented as a Fusion benchmark.
+
+### Codex lead token measurement
+
+For each bounded business task led by Codex, start the local Sidekick arm
+before planning or repository inspection unless the user opts out. Choose a
+short, non-sensitive case key that matches
+`^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$`, then run:
+
+```sh
+__SIDEKICK_BIN__ measure-start --case CASE --arm sidekick
+```
+
+Keep the returned trial ID private. After independent review, acceptance and
+the last necessary tool action, stop it immediately before the final response:
+
+```sh
+__SIDEKICK_BIN__ measure-stop --trial TRIAL_ID
+```
+
+Report the observed parent input, cached-input, cache-write-input, output,
+reasoning-output and total deltas. Content produced after the stop snapshot is
+outside the trial. Do not state a reduction percentage until a separate
+`lead-only` trial for the same case, model, effort, requirements and acceptance
+method has completed. The lead-only trial is started manually with
+`measure-start --case CASE --arm lead-only`, completed without invoking the
+Sidekick worker, and stopped with its returned trial ID. Then run:
+
+```sh
+__SIDEKICK_BIN__ measurement-report --case CASE
+```
+
+The report excludes mismatched model/effort and incomplete or duplicate arms
+from the paired calculation. Its counters cover only the Codex parent. They do
+not measure SWE-2, Devin or Fable usage and do not establish subscription
+quota, weekly-limit consumption or cost. Never copy rollout files or private
+measurement state into a repository or task packet.
 
 Report the selected worker model, export-reported model status, task ID,
 changed files, review findings, checks and results, elapsed time, retries,

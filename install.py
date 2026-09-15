@@ -20,12 +20,35 @@ import uuid
 
 
 ROOT = Path(__file__).resolve().parent
-VERSION = "0.2.0"
+VERSION = "0.3.0"
+PREVIOUS_VERSION = "0.2.0"
 LEGACY_VERSION = "0.1.1-local.1"
 
 # The source payload is deliberately explicit.  Adding a file here is a
 # release decision, rather than an accidental consequence of walking ROOT.
 PUBLIC_PAYLOADS = (
+    "swe_sidekick.py",
+    "sidekick_measurement.py",
+    "sidekick_evaluation.py",
+    "README.md",
+    "README_JA.md",
+    "SECURITY.md",
+    "LICENSE",
+    "TEST_REPORT.md",
+    "docs/HOSTS.md",
+    "docs/CHEATSHEET.md",
+    "docs/EVALUATION.md",
+    "docs/MASTER_PLAN.md",
+    "docs/ROADMAP.md",
+    "examples/packet.json",
+    "examples/evaluation-record.json",
+    "examples/evaluation.csv",
+)
+
+# Exact payloads written by the immediately previous managed release. Keep an
+# explicit allowlist so files introduced after 0.2.0 are never treated as
+# owned by an older manifest during a 0.3.0 upgrade.
+PREVIOUS_PAYLOADS = (
     "swe_sidekick.py",
     "sidekick_evaluation.py",
     "README.md",
@@ -149,6 +172,7 @@ def _skill_text(home: Path, app: Path) -> str:
     text = source.read_text(encoding="utf-8")
     replacements = {
         "__SIDEKICK_CLI__": str(home / CLI_RELATIVE),
+        "__SIDEKICK_BIN__": str(home / CLI_RELATIVE),
         "__SIDEKICK_HOME__": str(app),
     }
     for key, value in replacements.items():
@@ -212,17 +236,20 @@ def _known_paths(home: Path, version: str):
     particular, a path merely below a managed directory is not sufficient.
     """
     app = home / APP_BASE / version
-    paths = {
-        app / relative: 0o644
-        for relative in (PUBLIC_PAYLOADS if version == VERSION else LEGACY_PAYLOADS)
-    }
-    codex_skill_base = CODEX_SKILL_BASE if version == VERSION else LEGACY_CODEX_SKILL_BASE
+    if version == VERSION:
+        payloads_for_version = PUBLIC_PAYLOADS
+    elif version == PREVIOUS_VERSION:
+        payloads_for_version = PREVIOUS_PAYLOADS
+    else:
+        payloads_for_version = LEGACY_PAYLOADS
+    paths = {app / relative: 0o644 for relative in payloads_for_version}
+    codex_skill_base = CODEX_SKILL_BASE if version in (VERSION, PREVIOUS_VERSION) else LEGACY_CODEX_SKILL_BASE
     paths.update({
         home / codex_skill_base / "SKILL.md": 0o644,
         home / codex_skill_base / "agents/openai.yaml": 0o644,
         home / CLI_RELATIVE: 0o755,
     })
-    if version == VERSION:
+    if version in (VERSION, PREVIOUS_VERSION):
         paths[home / DEVIN_SKILL_BASE / "SKILL.md"] = 0o644
     return paths
 
@@ -259,7 +286,7 @@ def _manifest_records(home: Path, state):
     if not isinstance(state, dict):
         raise RuntimeError("Installation manifest must be an object")
     version = state.get("version")
-    if not isinstance(version, str) or version not in (VERSION, LEGACY_VERSION):
+    if not isinstance(version, str) or version not in (VERSION, PREVIOUS_VERSION, LEGACY_VERSION):
         raise RuntimeError("Unsupported installation manifest version")
     if "app_version" in state and state["app_version"] != version:
         raise RuntimeError("Manifest app version does not match version")

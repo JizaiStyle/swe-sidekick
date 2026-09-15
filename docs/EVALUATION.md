@@ -22,6 +22,59 @@ workflow's configuration or results.
 
 ## Recording workflow
 
+### Automatic Codex parent counters
+
+For a matched comparison, use a short non-sensitive case key and complete both
+arms from equivalent repository states with the same requirements, acceptance
+method, Codex model and reasoning effort:
+
+```sh
+swe-sidekick measure-start --case CASE --arm lead-only
+# Complete the task with the Codex lead only.
+swe-sidekick measure-stop --trial TRIAL_ID
+
+swe-sidekick measure-start --case CASE --arm sidekick
+# Complete the same task through the Sidekick workflow.
+swe-sidekick measure-stop --trial TRIAL_ID
+
+swe-sidekick measurement-report --case CASE
+```
+
+Call start before planning or repository inspection and stop after the final
+review and acceptance action. The start command binds to the invoking Codex
+session and makes the current root turn part of the trial. The stop command
+requires the same session. Content after the stop snapshot is not counted.
+
+The report preserves each observed trial and calculates `lead_only - sidekick`
+plus its percentage of the lead-only count for input, cached input, cache-write
+input, output, reasoning output and total tokens. Negative savings mean the
+Sidekick arm used more of that counter. A calculation requires exactly one
+completed, internally consistent arm of each kind and matching model/effort.
+Incomplete, duplicate, mismatched or malformed evidence remains visible as an
+issue and is not turned into a reduction.
+
+Only counters and bounded model/trial metadata are retained under the private
+Sidekick state directory; prompts, responses, rollout paths and response IDs
+are not copied. This measures the Codex parent only. It does not observe
+SWE-2/Devin/Fable tokens, price, account credits or weekly-limit debit. Use the
+host's current usage display separately if that account-level observation is
+needed, and do not derive it from these raw counters.
+
+Interpret the categories separately. Cached input and cache-write input are
+reported as input subcategories, while reasoning output is reported as an
+output subcategory; do not add either subcategory to `total_tokens` again.
+[OpenAI's current Codex pricing and limits documentation](https://learn.chatgpt.com/docs/pricing)
+uses different weights for input, cached input and output and directs users to
+`/status` and the usage dashboard for current account limits. Those provider
+displays are separate evidence from this tool's local raw counters.
+
+The invoked Codex skill starts the `sidekick` arm for a bounded business task
+unless the user opts out. A lead-only trial is deliberately manual because it
+must complete without invoking the worker. Use a new case key for every
+repetition so the strict one-pair rule stays unambiguous.
+
+### Business outcome record
+
 1. At the start of a business task, establish acceptance criteria, allowed scope,
    task category and lead host. Record start time and usage readings only when
    observed; do not reconstruct missing timestamps or waiting time from guesses.

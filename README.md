@@ -4,7 +4,7 @@ An opt-in skill for a **Codex or Devin/Fable lead** to delegate bounded implemen
 
 [Japanese / 日本語](README_JA.md) · [Cheat sheet](docs/CHEATSHEET.md) · [Host selection and handoff](docs/HOSTS.md) · [Security boundary](SECURITY.md) · [Validation](TEST_REPORT.md)
 
-This is a single-user prototype for trusted repositories on macOS/Linux with Python 3.10+, Git, and an installed, authenticated Devin CLI. It is not native Devin Fusion and does not select the lead model. Live model compatibility, latency, quota savings and cost savings are not established by the offline tests.
+This is a single-user prototype for trusted repositories on macOS/Linux with Python 3.10+, Git, and an installed, authenticated Devin CLI. It is not native Devin Fusion and does not select the lead model. The CLI can measure observed Codex parent token counters locally; offline tests alone do not establish live model compatibility, latency, quota savings or cost savings.
 
 ## Install
 
@@ -63,7 +63,34 @@ If “Codex” means a model offered inside Devin, the user can instead use Devi
 
 ## Measurements and development
 
-[EVALUATION.md](docs/EVALUATION.md) describes local evaluation records, missing measurements and comparison limits. Unknown token counts, costs or lead settings remain unknown; vendor results are not measurements of this wrapper.
+Version 0.3 can measure the Codex parent's input, cached-input,
+cache-write-input, output, reasoning-output and total token counters without
+copying prompts or responses. Run one matched task with the Codex lead alone
+and one with Sidekick:
+
+```sh
+swe-sidekick measure-start --case auth-fix-01 --arm lead-only
+# Complete the task with the lead only, then use the returned trial ID.
+swe-sidekick measure-stop --trial TRIAL_ID
+
+swe-sidekick measure-start --case auth-fix-01 --arm sidekick
+# Complete the same task with SWE Sidekick, then use its trial ID.
+swe-sidekick measure-stop --trial TRIAL_ID
+
+swe-sidekick measurement-report --case auth-fix-01
+```
+
+The paired report is calculated only for exactly one completed arm of each
+kind with the same confirmed lead model and effort. It reports observed raw
+counts and per-counter differences. It does not measure SWE-2/Devin/Fable
+tokens or prove how a subscription weekly limit or price was charged. Keep the
+same repository state, requirements, acceptance method, lead model and effort
+for both arms. The skill starts the Sidekick arm automatically for bounded
+Codex-led business tasks unless you opt out; the lead-only arm is manual.
+
+[EVALUATION.md](docs/EVALUATION.md) describes the protocol, local evaluation
+records, missing measurements and comparison limits. Unknown usage and costs
+remain unknown; vendor results are not measurements of this wrapper.
 
 Run offline tests without model inference:
 

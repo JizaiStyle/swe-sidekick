@@ -28,6 +28,24 @@ CLIは`~/.local/bin/swe-sidekick`、Codex向けSkillは`~/.codex/skills/swe-side
 
 クリーンな信頼済みGitリポジトリを対象に、許可するファイルと合格条件を決めて依頼してください。処理は`prepare → run → inspect → 親のレビュー → verify → ハッシュを指定してapply`です。自動のコミット・push・公開は行いません。
 
+## Codex親のトークン削減を測る
+
+v0.3では、Codex親の入力、キャッシュ済み入力、キャッシュ書き込み入力、出力、推論出力、合計トークンをローカルで取得します。プロンプトや回答本文は保存しません。同じ課題を同じCodexモデル・effort・開始状態・合格条件で2回実行します。
+
+```sh
+swe-sidekick measure-start --case auth-fix-01 --arm lead-only
+# Codex親だけで課題を完了し、返されたtrial IDで終了します。
+swe-sidekick measure-stop --trial TRIAL_ID
+
+swe-sidekick measure-start --case auth-fix-01 --arm sidekick
+# 同じ課題をSWE Sidekickで完了し、返されたtrial IDで終了します。
+swe-sidekick measure-stop --trial TRIAL_ID
+
+swe-sidekick measurement-report --case auth-fix-01
+```
+
+Codex親でSidekickを使う業務タスクでは、ユーザーが除外しない限りSkillが`sidekick`側の計測を開始します。`lead-only`側は手動です。レポートは各armが1件ずつ完了し、親モデルとeffortが一致する場合だけ削減数・削減率を計算します。SWE-2、Devin、Fable側のトークンや、契約のweekly limit・料金を直接測るものではありません。詳細は[計測方法](docs/EVALUATION.md)を参照してください。
+
 ## セクションごとに親を変える
 
 **可能です。別セッションで順番に引き継ぎます。** Codex親の作業を止め、`swe-sidekick handoff --task TASK_ID`のJSONと次の目的を、新しいDevin/Fable親へ渡します。逆方向も同じです。新しい親は現在の差分と検証結果を確認してから続けます。
@@ -38,6 +56,6 @@ CLIは`~/.local/bin/swe-sidekick`、Codex向けSkillは`~/.codex/skills/swe-side
 
 「Codex」がDevin内で選択できるモデルを指す場合は、Devinの`/model`で利用可能な親モデルを切り替える方法もあります。CodexアプリとDevinアプリの間を移る場合とは区別してください。
 
-[安全性の範囲](SECURITY.md)、[検証記録](TEST_REPORT.md)、[計測方法](docs/EVALUATION.md)も参照してください。実モデルでの互換性や速度・トークン・費用の削減は、オフライン試験だけでは確認できません。
+[安全性の範囲](SECURITY.md)、[検証記録](TEST_REPORT.md)、[計測方法](docs/EVALUATION.md)も参照してください。実モデルでの互換性や速度・トークン・費用の削減は、実務のペア試験で確認します。
 
 要求の正本は[MASTER_PLAN.md](docs/MASTER_PLAN.md)、進捗の正本は[ROADMAP.md](docs/ROADMAP.md)です。開発時には関連要件と検証根拠を更新します。[英語README](README.md)にインストール解除と開発手順を記載しています。

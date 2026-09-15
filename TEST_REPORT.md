@@ -1,27 +1,43 @@
 # Validation report
 
-Version: **0.2.0**. Checked **2026-09-15** on macOS with Python 3.14.7, Codex CLI 0.154.0 and Devin CLI 3000.10.21. Current release progress is maintained in [ROADMAP.md](docs/ROADMAP.md).
+Version: **0.3.0**. Checked **2026-09-15** on macOS with Python 3.14.7, Codex CLI 0.154.0 and Devin CLI 3000.10.21. Current release progress is maintained in [ROADMAP.md](docs/ROADMAP.md).
 
 ## Offline tests
 
 ```text
 python3 -m unittest discover -s tests -v
-Ran 76 tests in 52.923s
+Ran 86 tests in 41.949s
 OK
 ```
 
-The final suite ran after implementation writes finished. It covers bounded fake-worker execution, scope and Git guards, verification and apply gates, private evaluation records, read-only handoff, stale patch detection, task locks, malformed verification, state-specific continuation, and bracketed filenames as read-only inputs. Installer tests cover fresh installation, managed upgrade, same-version refresh, legacy host-path migration, modified/unowned refusal, backups and injected-failure rollback.
+The final suite ran after implementation writes finished. It covers bounded fake-worker execution, scope and Git guards, verification and apply gates, private evaluation records, read-only handoff, stale patch detection, task locks, malformed verification, state-specific continuation, and bracketed filenames as read-only inputs. Measurement fixtures cover current-root baselines, input/cache/output counters, report privacy, strict pairs, model mismatch, incomplete evidence, malformed rollouts, nonmonotonic counters and symlinks. Installer tests cover fresh installation, managed upgrades from 0.2.0 and the legacy release, same-version refresh, host-path migration, modified/unowned refusal, backups and injected-failure rollback.
 
-The elapsed time above is the local test suite duration, not model latency. No real Codex, Fable or SWE-2 inference was performed for this release.
+The elapsed time above is the local test suite duration, not model latency. No paid Codex, Fable or SWE-2 inference was started for release validation.
+
+## Current Codex rollout compatibility
+
+A temporary local trial exercised `measure-start`, `measure-stop` and
+`measurement-report` against the invoking Codex session's current rollout. It
+passed with the installed schema fields for input, cached input, cache-write
+input, output, reasoning output and total tokens. The smoke check also verified
+that CLI/report JSON omitted session/thread/root-turn IDs, rollout timestamps,
+ordinals and the cumulative baseline. Its temporary state was removed and its
+token values were not published. This proves compatibility with the checked
+Codex CLI build; the parser remains dependent on that private local schema.
 
 ## Native discovery and installation
 
 - Codex `skills/list` with a forced reload discovered exactly one enabled `swe-sidekick` in the Codex-specific skill directory, with the updated host-neutral prompt.
 - Devin `skills list --json` discovered exactly one `swe-sidekick`, `triggers: [user]`, and no skill warnings or errors.
 - The canonical skill passed the Codex skill creator's `quick_validate.py`; its OpenAI metadata retains `allow_implicit_invocation: false`. The Devin rendering adds its user trigger without a model or subagent override.
-- The local managed installation was upgraded to 0.2.0 with a backup. Its old managed shared skill was removed to prevent duplicate Devin discovery. No global model settings or task data were changed.
+- The managed installation was upgraded from 0.2.0 to 0.3.0 with a backup. The manifest covers 20 installed files and every recorded SHA-256 matched. The measurement module and cheat sheet are installed; no global model settings or task data changed.
 
-Discovery confirms loading and metadata, not actual Fable/SWE-2 execution, output quality, sandbox containment, billing or cache behavior. Exact model availability and the configured Devin version must still pass `doctor` before a real run.
+Codex app-server `skills/list` with `forceReload` returned exactly one enabled
+`swe-sidekick` without errors. Devin `skills list --json` returned exactly one
+explicit-user `swe-sidekick` without warnings or errors. Discovery confirms
+loading and metadata, not actual Fable/SWE-2 execution, output quality, sandbox
+containment, billing or cache charging. Exact model availability and the
+configured Devin version must still pass `doctor` before a real run.
 
 ## Public-tree checks
 

@@ -45,3 +45,11 @@ The read-only handoff snapshot includes task metadata, source/workspace paths, t
 ## Local evaluation data
 
 Manual evaluation records and summaries are private local observations, not telemetry uploads. They may include timing, usage readings and short reviewer notes; do not copy credentials or full trajectories into them. Unknown costs and lead settings remain null. Worker duration excludes lead planning/review. Vendor-published Fusion results use different tasks and conditions and do not establish relative performance on a private business task.
+
+Codex parent token trials read only relevant metadata and usage records from the
+rollout bound to the invoking `CODEX_SESSION_ID` and `CODEX_THREAD_ID`. Private
+trial files retain those binding IDs with mode `0600` under owner-only state
+directories; CLI reports omit the binding IDs, rollout paths, prompts,
+responses, response IDs and tool records. Parsing fails closed on ambiguous,
+malformed or nonmonotonic evidence. This local format is an implementation
+dependency and may need an update if Codex changes its rollout schema.

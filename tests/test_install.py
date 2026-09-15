@@ -59,12 +59,12 @@ class InstallTests(unittest.TestCase):
         global_codex_config.write_text("keep = true\n", encoding="utf-8")
         self.apply()
         manifest = self.read_manifest()
-        self.assertEqual(manifest["version"], "0.2.0")
-        self.assertEqual(manifest["app_version"], "0.2.0")
+        self.assertEqual(manifest["version"], "0.3.0")
+        self.assertEqual(manifest["app_version"], "0.3.0")
         self.assertTrue(manifest["created"])
         self.assertTrue(all("mode" in record for record in manifest["created"]))
 
-        app = self.home / ".local/share/codex-swe-sidekick/0.2.0"
+        app = self.home / ".local/share/codex-swe-sidekick/0.3.0"
         cli = self.home / ".local/bin/swe-sidekick"
         codex_skill = self.home / ".codex/skills/swe-sidekick/SKILL.md"
         devin_skill = self.home / ".config/devin/skills/swe-sidekick/SKILL.md"
@@ -72,6 +72,8 @@ class InstallTests(unittest.TestCase):
         self.assertTrue((app / "README.md").is_file())
         self.assertTrue((app / "TEST_REPORT.md").is_file())
         self.assertTrue((app / "docs/HOSTS.md").is_file())
+        self.assertTrue((app / "docs/CHEATSHEET.md").is_file())
+        self.assertTrue((app / "sidekick_measurement.py").is_file())
         self.assertTrue(codex_openai.is_file())
         self.assertTrue(cli.is_file())
         self.assertEqual(self.mode(cli), 0o755)
@@ -130,7 +132,7 @@ class InstallTests(unittest.TestCase):
     def test_same_version_upgrade_refreshes_changed_source_with_backup(self):
         self.apply()
         desired = install.payloads(self.home)
-        target = self.home / ".local/share/codex-swe-sidekick/0.2.0/README.md"
+        target = self.home / ".local/share/codex-swe-sidekick/0.3.0/README.md"
         desired[target] = (b"updated release report\n", 0o644)
         old_bytes = target.read_bytes()
         with patch.object(install, "payloads", return_value=desired):
@@ -146,7 +148,7 @@ class InstallTests(unittest.TestCase):
 
     def test_unowned_target_refuses_upgrade(self):
         self._make_legacy_install()
-        target = self.home / ".local/share/codex-swe-sidekick/0.2.0/README.md"
+        target = self.home / ".local/share/codex-swe-sidekick/0.3.0/README.md"
         target.parent.mkdir(parents=True)
         target.write_text("unowned", encoding="utf-8")
         old_manifest = self.manifest_path().read_bytes()
@@ -155,6 +157,59 @@ class InstallTests(unittest.TestCase):
         self.assertEqual(target.read_text(encoding="utf-8"), "unowned")
         self.assertEqual(self.manifest_path().read_bytes(), old_manifest)
         self.assertFalse((self.home / ".local/state/codex-swe-sidekick/install-backups").exists())
+
+    def _make_previous_install(self):
+        """Build a managed 0.2.0 fixture from the pre-measurement payload."""
+        old_app = self.home / install.APP_BASE / install.PREVIOUS_VERSION
+        records = []
+        for relative in install.PREVIOUS_PAYLOADS:
+            source = ROOT / relative
+            data = source.read_bytes()
+            path = old_app / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(data)
+            os.chmod(path, 0o644)
+            records.append({"path": str(path), "sha256": hashlib.sha256(data).hexdigest(), "mode": 0o644})
+
+        canonical = install._skill_text(self.home, old_app)
+        codex_skill = self.home / install.CODEX_SKILL_BASE
+        devin_skill = self.home / install.DEVIN_SKILL_BASE
+        (codex_skill / "agents").mkdir(parents=True, exist_ok=True)
+        devin_skill.mkdir(parents=True, exist_ok=True)
+        (codex_skill / "SKILL.md").write_text(canonical, encoding="utf-8")
+        (codex_skill / "agents/openai.yaml").write_bytes((ROOT / "skill/agents/openai.yaml").read_bytes())
+        (devin_skill / "SKILL.md").write_text(install._devin_skill_text(canonical), encoding="utf-8")
+        for path in (codex_skill / "SKILL.md", codex_skill / "agents/openai.yaml", devin_skill / "SKILL.md"):
+            os.chmod(path, 0o644)
+            records.append({"path": str(path), "sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "mode": 0o644})
+
+        cli = self.home / install.CLI_RELATIVE
+        cli.parent.mkdir(parents=True, exist_ok=True)
+        cli.write_text("#!/bin/sh\nexec " + repr(sys.executable) + " " + repr(str(old_app / "swe_sidekick.py")) + ' "$@"\n', encoding="utf-8")
+        os.chmod(cli, 0o755)
+        records.append({"path": str(cli), "sha256": hashlib.sha256(cli.read_bytes()).hexdigest(), "mode": 0o755})
+
+        manifest = self.manifest_path()
+        manifest.parent.mkdir(parents=True, exist_ok=True)
+        manifest.write_text(json.dumps({"version": install.PREVIOUS_VERSION,
+                                        "app_version": install.PREVIOUS_VERSION,
+                                        "created": records}, indent=2) + "\n", encoding="utf-8")
+        os.chmod(manifest, 0o600)
+
+    def test_managed_upgrade_from_previous_020_adds_measurement_payload(self):
+        self.assertNotIn("sidekick_measurement.py", install.PREVIOUS_PAYLOADS)
+        self.assertNotIn("docs/CHEATSHEET.md", install.PREVIOUS_PAYLOADS)
+        self._make_previous_install()
+        old_app = self.home / install.APP_BASE / install.PREVIOUS_VERSION
+        code, _, err = self.invoke("--upgrade", "--apply")
+        self.assertEqual(code, 0, err)
+        manifest = self.read_manifest()
+        self.assertEqual(manifest["version"], "0.3.0")
+        self.assertEqual(manifest["previous_app_version"], "0.2.0")
+        self.assertTrue(old_app.is_dir())
+        self.assertTrue((self.home / install.APP_BASE / "0.3.0/sidekick_measurement.py").is_file())
+        self.assertTrue((self.home / install.APP_BASE / "0.3.0/docs/CHEATSHEET.md").is_file())
+        self.assertTrue((self.home / install.CODEX_SKILL_BASE / "SKILL.md").is_file())
 
     def _make_legacy_install(self):
         old_app = self.home / ".local/share/codex-swe-sidekick" / install.LEGACY_VERSION
@@ -211,7 +266,7 @@ class InstallTests(unittest.TestCase):
         code, _, err = self.invoke("--upgrade")
         self.assertEqual(code, 0, err)
         self.assertEqual(self.manifest_path().read_bytes(), old_manifest)
-        self.assertFalse((self.home / ".local/share/codex-swe-sidekick/0.2.0").exists())
+        self.assertFalse((self.home / ".local/share/codex-swe-sidekick/0.3.0").exists())
         self.assertFalse((self.home / ".local/state/codex-swe-sidekick/install-backups").exists())
 
         self.apply("--upgrade")
@@ -263,7 +318,7 @@ class InstallTests(unittest.TestCase):
         self.assertTrue(self.legacy_unowned.is_file())
         self.assertFalse((self.home / ".codex/skills/swe-sidekick/SKILL.md").exists())
         self.assertFalse((self.home / ".config/devin/skills/swe-sidekick/SKILL.md").exists())
-        self.assertFalse((self.home / ".local/share/codex-swe-sidekick/0.2.0").exists())
+        self.assertFalse((self.home / ".local/share/codex-swe-sidekick/0.3.0").exists())
         self.assertEqual((state / "config.json").read_text(encoding="utf-8"), '{"keep": true}\n')
         backups = list((state / "install-backups").iterdir())
         self.assertEqual(len(backups), 1)
