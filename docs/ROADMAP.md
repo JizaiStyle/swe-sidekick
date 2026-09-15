@@ -15,8 +15,8 @@ This file is the single source of truth for current progress. Status values are 
 | MP-15 | 5 / MP-10, MP-14 | Complete | English operator cheat sheet added and linked from both READMEs and the host guide. Files: `docs/CHEATSHEET.md`, `docs/HOSTS.md`, `README*`, plan and roadmap. Lead model/effort and worker configuration are explicitly independent. | Documentation validation passed as recorded below. No runtime, installation or active model setting changed. Remote HEAD is checked at publication. |
 | MP-16 | 6 / MP-10 | Complete | `measure-start` and `measure-stop` bind to the invoking Codex rollout, include the current root turn, retain only counters/metadata in private state, and emit no binding IDs or cumulative baseline. Synthetic and current-rollout checks passed. Files: `sidekick_measurement.py`, `swe_sidekick.py`, tests. | No implementation work remains. The private Codex rollout schema is an explicit compatibility dependency. Evidence: [TEST_REPORT.md](../TEST_REPORT.md). |
 | MP-17 | 7 / MP-16 | Complete | `measurement-report` preserves sanitized observations and calculates per-counter saved values and percentages only for exactly one complete arm of each kind with the same case/model/effort. Missing, duplicate, inconsistent and mismatched evidence is excluded with a reason. Files: measurement module and tests. | A real matched business-task pair is still needed to produce a project-specific savings result. Raw parent counters do not prove weekly-limit or cost effects. |
-| MP-18 | 8 / MP-16, MP-17 | In progress | CLI/installer version 0.3.0, skill workflow, English/Japanese usage, cheat sheet, evaluation protocol, security notes and tests are complete. Full offline suite, current-rollout schema smoke, CLI help, skill validation, links, privacy, managed upgrade, manifest hashes and native Codex/Devin discovery passed. | Scan the final tree/history, publish, pass hosted CI and verify remote HEAD and final installed payloads. |
-| MP-19 | 9 / MP-10, MP-12 | Complete (local and installed) | Delegate implementation/repairs promptly; lead owns direction/review/necessary acceptance, with direct implementation only by explicit user direction. Distinguish worker starts, preparation and lead tools. The canonical and both installed host renderings passed validation/discovery. Files: `skill/SKILL.md`, master plan and this roadmap. | Publish with v0.3.0 and verify the remote copy. |
+| MP-18 | 8 / MP-16, MP-17 | Complete | CLI/installer version 0.3.0, skill workflow, English/Japanese usage, cheat sheet, evaluation protocol, security notes and tests are published. The 86-test local suite, current-rollout schema smoke, CLI help, skill validation, links, privacy/secret scans, managed upgrade, manifest hashes, native discovery and hosted Python 3.10/3.12/3.14 matrix passed. | No release work remains. A matched real-task pair is the next operational measurement, not a missing release artifact. Evidence: [TEST_REPORT.md](../TEST_REPORT.md). |
+| MP-19 | 9 / MP-10, MP-12 | Complete | Delegate implementation/repairs promptly; lead owns direction/review/necessary acceptance, with direct implementation only by explicit user direction. Distinguish worker starts, preparation and lead tools. The guidance is published with v0.3.0; canonical and installed host renderings passed validation/discovery. Files: `skill/SKILL.md`, master plan and this roadmap. | No remaining work. |
 
 ## Validation record
 
@@ -62,4 +62,11 @@ to 0.3.0 with a backup. All 20 manifest hashes matched, including the new
 measurement module and installed cheat sheet. Forced Codex discovery returned
 one enabled skill without errors; Devin returned one user-triggered skill
 without warnings/errors. Global model settings and existing task data were not
-changed. Publication remains the only unfinished release step.
+changed. At that point publication was the only unfinished release step.
+
+2026-09-15 — MP-18/19 publication: the reviewed v0.3 runtime commit
+`21f84c49b214c309b2a1b5e9122825ca4031cc20` was pushed to the public `main`.
+GitHub Actions run
+[34928507570](https://github.com/JizaiStyle/swe-sidekick/actions/runs/34928507570)
+passed the 86-test suite on Python 3.10, 3.12 and 3.14. The final documentation
+update records release evidence only; runtime, installer and tests are unchanged.

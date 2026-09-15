@@ -43,9 +43,9 @@ configured Devin version must still pass `doctor` before a real run.
 
 - Gitleaks 8.30.1 directory and fresh Git-history scans: no leaks detected. The scanner archive was checked against its published checksum before use.
 - The public file list was inspected for personal absolute paths, private project references, real historical task IDs, raw logs, local state and credential material. None of those were included. Example Git identities are synthetic; publication uses a GitHub noreply commit address.
-- Markdown relative links and canonical skill metadata passed validation. The first [hosted GitHub Actions run](https://github.com/JizaiStyle/swe-sidekick/actions/runs/34909675633) completed successfully on Ubuntu for all three Python versions: 3.10, 3.12 and 3.14. This is separate from the local macOS result above. Subsequent release-evidence-only documentation changes do not change the tested runtime, installer or tests.
+- Markdown relative links and canonical skill metadata passed validation. The v0.3 [hosted GitHub Actions run](https://github.com/JizaiStyle/swe-sidekick/actions/runs/34928507570) completed successfully on Ubuntu for Python 3.10, 3.12 and 3.14. This is separate from the local macOS result above. The later release-evidence-only documentation commit does not change the tested runtime, installer or tests.
 
-GitHub API checks confirmed that [the repository](https://github.com/JizaiStyle/swe-sidekick) is public and its initial `main` matched the reviewed release commit `68024d1e02e70749bad26fe2c32da4c485e4121c`. The original private development tree and its history were not imported.
+GitHub checks confirmed that [the repository](https://github.com/JizaiStyle/swe-sidekick) remains public and accepted the reviewed v0.3 runtime commit `21f84c49b214c309b2a1b5e9122825ca4031cc20`. The original private development tree and its history were not imported.
 
 Scanning is not a guarantee that arbitrary future task artifacts are safe to publish. Handoff snapshots, evaluation records, prompts and worker logs remain private local data.
 
