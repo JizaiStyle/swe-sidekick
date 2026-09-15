@@ -18,7 +18,7 @@ This file is the single source of truth for current progress. Status values are 
 | MP-18 | 8 / MP-16, MP-17 | Complete | CLI/installer version 0.3.0, skill workflow, English/Japanese usage, cheat sheet, evaluation protocol, security notes and tests are published. The 86-test local suite, current-rollout schema smoke, CLI help, skill validation, links, privacy/secret scans, managed upgrade, manifest hashes, native discovery and hosted Python 3.10/3.12/3.14 matrix passed. | No release work remains. A matched real-task pair is the next operational measurement, not a missing release artifact. Evidence: [TEST_REPORT.md](../TEST_REPORT.md). |
 | MP-19 | 9 / MP-10, MP-12 | Complete | Delegate implementation/repairs promptly; lead owns direction/review/necessary acceptance, with direct implementation only by explicit user direction. Distinguish worker starts, preparation and lead tools. The guidance is published with v0.3.0; canonical and installed host renderings passed validation/discovery. Files: `skill/SKILL.md`, master plan and this roadmap. | No remaining work. |
 
-| MP-20 | 10 / MP-10 | In progress | Stabilize private preparation against command-triggered background Git maintenance. SWE-2 High owns CLI helper and focused regression tests. | Preserve all tamper detection; isolated large-repository prepare/inspect acceptance remains pending. |
+| MP-20 | 10 / MP-10 | Complete (local implementation and installation) | Command-scoped gc.auto=0 and maintenance.auto=false prevent deferred Git mutation. SWE-2 High changed CLI helper and two focused tests. Exact metadata tamper checks remain unchanged. | 58-test suite passed; actual large-repository prepare/clean inspection and deliberate info/refs rejection passed. Applied regressions passed, managed runtime installed and byte-matched. Not pushed or published. |
 
 ## Validation record
 
@@ -72,3 +72,5 @@ GitHub Actions run
 [34928507570](https://github.com/JizaiStyle/swe-sidekick/actions/runs/34928507570)
 passed the 86-test suite on Python 3.10, 3.12 and 3.14. The final documentation
 update records release evidence only; runtime, installer and tests are unchanged.
+
+2026-09-15 — MP-20 completed locally. Initial worker investigation produced no patch after an optional PATH-shim experiment was denied; that operation was not retried. A bounded source/test-only retry completed with matching SWE-2 High export. Both turns were retained (271.375s and 277.916s). Independent wrapper verification passed 58 tests; real large-repository preparation preserved clean source and unexpected Git metadata remained rejected. Two affected regressions passed after apply. Managed installation changed only the CLI and plan payloads; model settings and task-state protections were preserved. No public release was made for this fix.

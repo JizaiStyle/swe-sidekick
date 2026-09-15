@@ -121,7 +121,9 @@ def capture(argv, cwd=None, timeout=60, env=None, input_data=None):
 
 def git(root: Path, *args, env=None, input_data=None):
     return capture(["git", "--literal-pathspecs", "-c", "core.hooksPath=/dev/null",
-                    "-c", "core.fsmonitor=false", "-c", "core.autocrlf=false", "-C", str(root), *args],
+                    "-c", "core.fsmonitor=false", "-c", "core.autocrlf=false",
+                    "-c", "gc.auto=0", "-c", "maintenance.auto=false",
+                    "-C", str(root), *args],
                    env=env, input_data=input_data)
 
 

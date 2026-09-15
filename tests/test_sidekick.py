@@ -190,6 +190,43 @@ class SetupTests(Base):
         self.assertTrue((task / "workspace/.git").is_dir())
         self.assertNotEqual(s.git(task / "workspace", "rev-parse", "HEAD"), self.g("rev-parse", "HEAD"))
 
+    def test_sidekick_git_disables_auto_maintenance(self):
+        seen = []
+
+        def fake_capture(argv, **kwargs):
+            seen.append(argv)
+            return b""
+
+        with patch.object(s, "capture", fake_capture):
+            s.git(self.repo, "status", "--porcelain=v1")
+            s.git(self.repo, "-c", "user.name=fixture", "commit", "--quiet", "-m", "x")
+        self.assertEqual(len(seen), 2)
+        for argv in seen:
+            self.assertEqual(argv[:2], ["git", "--literal-pathspecs"])
+            self.assertIn("-C", argv)
+            for flag in ("core.hooksPath=/dev/null", "core.fsmonitor=false", "core.autocrlf=false",
+                         "gc.auto=0", "maintenance.auto=false"):
+                self.assertIn(flag, argv)
+            for flag in ("gc.auto=0", "maintenance.auto=false"):
+                pos = argv.index(flag)
+                self.assertEqual(argv[pos - 1], "-c")
+                self.assertLess(pos, argv.index("-C"))
+
+    def test_new_git_metadata_info_refs_violates_scope(self):
+        task = self.prepare()
+        state = s.read_json(task / "state.json")
+        self.assertTrue(s.inspect_scope(task, state)["scope_ok"])
+        info = task / "workspace/.git/info"
+        self.assertTrue(info.is_dir())
+        (info / "refs").write_text("late auto-maintenance output\n")
+        report = s.inspect_scope(task, state)
+        self.assertFalse(report["scope_ok"])
+        self.assertIn("Git HEAD/refs/index/config/hooks changed", "; ".join(report["violations"]))
+        (info / "refs").unlink()
+        self.assertTrue(s.inspect_scope(task, state)["scope_ok"])
+        (info / "exclude").write_text("tampered\n")
+        self.assertFalse(s.inspect_scope(task, state)["scope_ok"])
+
     def test_prepare_records_utc_created_at(self):
         task = self.prepare()
         state = s.read_json(task / "state.json")
