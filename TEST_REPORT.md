@@ -93,3 +93,25 @@ passed the runtime packet validator; metadata parsing, skill validation,
 relative links, public-language scanning and managed payload rendering passed.
 No runtime code changed, and the earlier full test suite was not rerun for this
 update. Publication and the matching managed installation were refreshed.
+
+
+## Cleanup failure recording (MP-24, 2026-09-18)
+
+Process cleanup OS errors are now sanitized and recorded without a fallback
+kill path or permission escalation. Even a zero child exit remains a failed
+run when cleanup fails. Verification stops before its next command. Existing
+interrupted task records and validated-session/model gates are unchanged.
+
+- SWE-2 High implemented the bounded runtime/test change. Review found a
+  verification-loop continuation gap; the same validated session corrected it.
+- Independent verification: all 64 `test_sidekick.py` tests passed in 62.497
+  seconds (wrapper duration), and `git diff --check` passed.
+- After applying the reviewed patch, all five cleanup regressions passed in
+  6.208 seconds. The canonical skill passed `quick_validate.py`.
+- Tests cover timeout and normal-exit denial, retained failed-turn evidence,
+  sanitized diagnostics, no second signal after denial, no second verifier,
+  and successful/already-gone process groups.
+
+These are synthetic error-path tests. They neither identify the original OS
+cause nor prove that remote inference stopped. Hosted CI, merge and managed
+installation evidence will be recorded after those steps complete.
