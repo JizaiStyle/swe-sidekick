@@ -22,8 +22,13 @@ after the default interpreter reported that dependency missing. Documentation
 links, whitespace and public-content checks passed. Installed pnpm 11.21.0
 help identifies `install --lockfile-only` as lockfile-only work; this is command
 selection evidence, not a completed application dependency installation.
-Managed installation and hosted CI evidence are recorded in the roadmap when
-completed. Earlier failed application work is not retroactively accepted.
+The managed same-version upgrade created a backup; all 20 payloads, modes and
+manifest hashes matched the reviewed source and Codex/Devin renderings. The
+[pull-request CI run](https://github.com/JizaiStyle/swe-sidekick/actions/runs/35314532688)
+passed on Python 3.10, 3.12 and 3.14. [PR #1](https://github.com/JizaiStyle/swe-sidekick/pull/1)
+merged at `5be39f57e382bb08b37b229b7214c9e7dedbaf9c`; GitHub reported it
+merged on 2026-09-18. This final evidence update changes documentation only.
+Earlier failed application work is not retroactively accepted.
 
 ## Earlier release validation (2026-09-15)
 
