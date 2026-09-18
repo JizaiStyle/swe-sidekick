@@ -100,7 +100,65 @@ paths.
 For non-interactive sandbox runs, edit through the existing sandboxed Exec or
 shell path. Keep the worker sandbox, permission mode, workspace trust, and
 denied-command settings unchanged. Do not change permissions or bypass a
-denied operation. If the sandboxed operation is denied, report it and stop.
+denied operation. Stop the affected operation on an explicit denial or an
+ambiguous permission error, preserve partial work, and report the command,
+exit status, diagnostic and affected paths without secrets. This does not
+require abandoning independent authorized work or the whole task.
+
+### Diagnose before resuming
+
+The lead inspects the failed command, tool result, partial diff and relevant
+read-only evidence. An `EPERM`/`EACCES` errno alone proves neither a policy
+denial nor a harmless filesystem limitation. Do not relabel a denial as a
+tool incompatibility without evidence.
+
+- An explicit sandbox, approval or command-policy denial remains binding.
+  Do not obtain the denied access through another tool, host execution,
+  `sudo`, permission changes, a different path, or relaxed trust/deny settings.
+- For an ordinary command failure, missing dependency or unsupported operation,
+  identify a supported approach using the installed version's help and relevant
+  official documentation. A changed command is acceptable only after the lead
+  establishes that it stays within the existing authorized paths, objective
+  and permissions and does not carry out the prohibited operation. Uncertain
+  cases remain blocked; do not automatically retry or silently fall back.
+- Preserve user work and intermediate evidence. Inspect partial changes before
+  resuming. Remove only known task-created disposable artifacts when already
+  authorized; do not use broad cleanup, reset or task-state edits.
+- Reuse established authorization for a bounded repair. Use an explicit retry
+  of the validated session within the remaining turn budget, or prepare a new
+  task if its scope must change. Do not add a permission question just because
+  a command failed. If new access or a consequential decision is actually
+  needed, finish independent preparation, state the concrete blocker and ask
+  only for that missing decision. Elapsed time is never approval.
+
+A previously failed or noncompliant attempt stays recorded as such. A later
+successful check does not erase it; review and verify the resulting patch
+before acceptance. If recovery is not possible under the current permissions,
+report the remaining blocked operation and continue only independent work.
+
+### Dependency preparation
+
+Dependency installation and external access are forbidden by default. When
+needed for the authorized task, the lead must explicitly include the package
+names and versions, exact package-manager commands, approved registry access
+and scratch-local temporary/cache paths in the packet. Disable lifecycle
+scripts and preserve integrity/security policies. Never read credentials,
+reuse source/host caches, or copy `.env` files or `node_modules`. This limited
+exception does not authorize arbitrary network access or a full install.
+
+Check the actual package-manager version and supported flags before choosing
+a command. For lockfile work, prefer editing only the approved manifest and
+then using a supported lockfile-only resolution command. For pnpm, check
+`pnpm install --help` before using `pnpm install --lockfile-only --ignore-scripts`;
+do not assume `pnpm add` has identical behavior in every version. If a
+lockfile-only operation unexpectedly starts linking packages, stop it, inspect
+partial changes and diagnose before another command. Do not work around an
+unexplained reflink denial by changing import methods or performing a full
+install. Verification must show manifest/lock consistency and check for
+unexpected artifacts; a frozen-lockfile-only check is not proof that packages
+were installed or that the application passes its tests. See the
+[pnpm install documentation](https://pnpm.io/cli/install) and the installed
+version's help; online documentation may describe a different version.
 
 Run `prepare --repo <root> --packet <file> --trust-repo` only after the checks
 above, then run `run --task <returned-id>`. Poll the existing task instead of
@@ -120,7 +178,10 @@ exit code, hash, or green worker test is not by itself acceptance.
 Run `verify --task <id>` only after reviewing the listed commands and scripts.
 It runs in the scratch workspace under the caller's permissions and adds no
 separate sandbox. Missing dependencies are a blocker; do not install arbitrary
-dependencies or copy credentials, `.env` files, or `node_modules`.
+dependencies or copy credentials, `.env` files, or `node_modules`. Use the
+dependency preparation and diagnosis rules above to resolve that blocker
+within existing authorization. Host verification must never be used to bypass
+a denied worker operation.
 
 For a bounded correction, write a feedback file and run
 `retry --task <id> --feedback-file <file>`. Retry only the validated exported

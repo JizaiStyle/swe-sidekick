@@ -31,6 +31,23 @@ Git scope checks are after-the-fact. They cannot detect all read access, network
 
 A command deny list is defense-in-depth, not proof that equivalent actions cannot be performed via another executable. This wrapper is not suitable for multi-tenant execution, production deployment automation, payment/credential administration or operating hostile code.
 
+Failure recovery is an operator/model instruction, not an automatic errno
+classifier or an added containment control. An explicit denial or ambiguous
+permission error stops the affected operation. The lead may diagnose it with
+read-only evidence and continue independent authorized work. A supported
+alternative must preserve the same scope and permissions and cannot obtain
+denied access through another tool or host execution. No retry, permission
+change or acceptance is automatic. Failed and noncompliant attempts remain
+part of the review record.
+
+Dependency/network access remains forbidden by default. An explicit packet may
+authorize specified versions, commands, registry access and scratch-local
+temporary/cache paths with lifecycle scripts disabled. This guidance does not
+enforce a network allowlist or prove that a package manager avoids unexpected
+side effects. Unexpected linking during lockfile-only work must stop for
+diagnosis; do not weaken integrity policies or silently fall back to a full
+install. See [the skill](skill/SKILL.md#dependency-preparation).
+
 The model export is checked conservatively, but server-side model routing and billing can differ. Metadata comparison is not a pricing guarantee. A timeout/turn count is not a dollar cap or a guarantee that remote inference stops immediately. No automatic cleanup of logs or provider-side stored sessions is performed.
 
 Raw prompts, logs, trajectories, diffs and verification outputs can include private source or sensitive data. Do not publish them automatically. The simple error-message redactor is not a comprehensive DLP system. Keep the state directory private, inspect content before sharing, and remove retained sessions/logs according to your policies.

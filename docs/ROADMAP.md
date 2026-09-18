@@ -1,6 +1,6 @@
 # SWE Sidekick Roadmap
 
-Updated: 2026-09-15
+Updated: 2026-09-18
 Requirements: [MASTER_PLAN.md](MASTER_PLAN.md)
 
 This file is the single source of truth for current progress. Status values are **Not started**, **In progress**, **Partially complete**, **Complete**, and **On hold**; implementation, validation, installation, and publication are recorded separately.
@@ -17,6 +17,7 @@ This file is the single source of truth for current progress. Status values are 
 | MP-17 | 7 / MP-16 | Complete | `measurement-report` preserves sanitized observations and calculates per-counter saved values and percentages only for exactly one complete arm of each kind with the same case/model/effort. Missing, duplicate, inconsistent and mismatched evidence is excluded with a reason. Files: measurement module and tests. | A real matched business-task pair is still needed to produce a project-specific savings result. Raw parent counters do not prove weekly-limit or cost effects. |
 | MP-18 | 8 / MP-16, MP-17 | Complete | CLI/installer version 0.3.0, skill workflow, English/Japanese usage, cheat sheet, evaluation protocol, security notes and tests are published. The 86-test local suite, current-rollout schema smoke, CLI help, skill validation, links, privacy/secret scans, managed upgrade, manifest hashes, native discovery and hosted Python 3.10/3.12/3.14 matrix passed. | No release work remains. A matched real-task pair is the next operational measurement, not a missing release artifact. Evidence: [TEST_REPORT.md](../TEST_REPORT.md). |
 | MP-19 | 9 / MP-10, MP-12 | Complete | Delegate implementation/repairs promptly; lead owns direction/review/necessary acceptance, with direct implementation only by explicit user direction. Distinguish worker starts, preparation and lead tools. The guidance is published with v0.3.0; canonical and installed host renderings passed validation/discovery. Files: `skill/SKILL.md`, master plan and this roadmap. | No remaining work. |
+| MP-23 | 13 / MP-19–22 | Partially complete | Worker prompt, canonical skill, English/Japanese README and security guidance implement operation-level stopping, lead diagnosis, bounded recovery and explicit dependency preparation. Independent 59-test verification and the post-apply first-run/retry regression passed on 2026-09-18. | Managed installation, hosted CI and GitHub merge remain. Validation: [TEST_REPORT.md](../TEST_REPORT.md#bounded-failure-recovery-mp-23-2026-09-18). |
 
 | MP-20 | 10 / MP-10 | Complete | Command-scoped gc.auto=0 and maintenance.auto=false prevent deferred Git mutation. SWE-2 High changed CLI helper and two focused tests. Exact metadata tamper checks remain unchanged. The fix is published and installed. | The 58-test local suite, large-repository prepare/clean inspection, deliberate info/refs rejection, two focused post-apply regressions and hosted three-version suite passed. Evidence: [TEST_REPORT.md](../TEST_REPORT.md). |
 

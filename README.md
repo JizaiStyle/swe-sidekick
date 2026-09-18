@@ -47,6 +47,23 @@ prepare → run → inspect → independent review → verify → apply reviewed
 
 No automatic commit, push, deployment, fallback model or unlimited retry is performed. See the [skill](skill/SKILL.md) for the full gates and the [security document](SECURITY.md) before running project code.
 
+### Recover a failed operation
+
+Stop the affected operation and preserve its partial changes. The lead checks
+the command, exit status and diagnostic before deciding whether a supported
+approach stays within the same authorized scope and permissions. An `EPERM`
+alone does not identify the cause. A real policy denial must not be bypassed
+through another tool, host execution or changed settings. Independent work can
+continue; a bounded retry reuses existing authorization and the validated
+session, without an automatic approval or retry loop.
+
+Dependency preparation requires an explicit packet naming versions, commands,
+approved registry access and scratch-local cache paths, with lifecycle scripts
+disabled. Check the installed tool's flags: a lockfile-only command that starts
+linking packages is a failed operation to diagnose, not permission for a full
+install. See [the recovery and dependency rules](skill/SKILL.md#diagnose-before-resuming).
+Failed checks remain recorded separately from later verification success.
+
 ## Change the lead between sections
 
 Yes: finish a section in one host, stop active work, and export a local snapshot:
