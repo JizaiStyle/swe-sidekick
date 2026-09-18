@@ -1,6 +1,35 @@
 # Validation report
 
-Version: **0.3.0**. Checked **2026-09-15** on macOS with Python 3.14.7, Codex CLI 0.154.0 and Devin CLI 3000.10.21. Current release progress is maintained in [ROADMAP.md](docs/ROADMAP.md).
+Version: **0.3.0**. Current release progress is maintained in [ROADMAP.md](docs/ROADMAP.md).
+
+## Bounded failure recovery (MP-23, 2026-09-18)
+
+The worker changed only `worker_prompt` and one offline first-run/retry regression.
+The selected SWE-2 High worker matched its exported model and completed in one
+turn (613.416 seconds). Independent review confirmed that runtime AST outside
+`worker_prompt` is unchanged, including sandbox/permission settings, task
+state, retry limits and apply gates. Worker duration is not cost or quota data.
+
+Independent `verify` ran the 59 wrapper tests successfully in 41.588 seconds.
+After reviewed-hash apply, the source repository's new first-run/retry test
+passed in 4.283 seconds. The fake worker exercises prompt generation and the
+validated same-session retry; it does not simulate an OS sandbox or prove live
+error recovery. The implementation run itself used the official Devin CLI
+3000.10.31. No model inference is invoked by the tests.
+
+Canonical skill validation passed using an isolated environment with PyYAML
+after the default interpreter reported that dependency missing. Documentation
+links, whitespace and public-content checks passed. Installed pnpm 11.21.0
+help identifies `install --lockfile-only` as lockfile-only work; this is command
+selection evidence, not a completed application dependency installation.
+Managed installation and hosted CI evidence are recorded in the roadmap when
+completed. Earlier failed application work is not retroactively accepted.
+
+## Earlier release validation (2026-09-15)
+
+The following records were checked on macOS with Python 3.14.7, Codex CLI
+0.154.0 and Devin CLI 3000.10.21; they are historical evidence, not reruns for
+MP-23.
 
 ## Offline tests
 

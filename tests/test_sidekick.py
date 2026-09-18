@@ -248,6 +248,43 @@ class SetupTests(Base):
         self.assertIn("Exec(git push)", denied)
         self.assertEqual(config["sandbox"]["excluded"]["deny"], ["Exec(*)"])
 
+    def test_prompt_recovery_and_dependency_bounds_hold_across_turns(self):
+        self.configure()
+        self.mode(behavior="no_changes")
+        task = self.prepare()
+        self.worker(ok=False)
+        feedback = self.root / "feedback.md"
+        feedback.write_text("Continue the same task within the unchanged scope.")
+        self.mode(expect_resume=True)
+        self.cmd("retry", "--task", self.task_id, "--feedback-file", feedback)
+
+        expected = ["Never bypass a denied sandboxed command",
+                    "stops only the affected operation",
+                    "exact command, exit status and diagnostic without secrets",
+                    "partial work",
+                    "EPERM or EACCES",
+                    "Dependency preparation is forbidden by default",
+                    "lifecycle scripts disabled",
+                    "scratch-local temporary/cache paths",
+                    "lockfile-only command"]
+        prompts = [(task / f"turn-{index:02d}/prompt.txt").read_text() for index in (1, 2)]
+        for prompt in prompts:
+            for phrase in expected:
+                self.assertIn(phrase, prompt)
+        self.assertTrue(prompts[1].startswith(prompts[0]))
+        self.assertIn("LEAD REVIEW FEEDBACK FOR THIS SAME TASK", prompts[1])
+        self.assertIn(feedback.read_text().strip(), prompts[1])
+
+        for index in (1, 2):
+            config = s.read_json(task / f"turn-{index:02d}/devin-config.json")
+            denied = config["permissions"]["deny"]
+            self.assertIn("Exec(git commit)", denied)
+            self.assertIn("Exec(git push)", denied)
+            self.assertEqual(config["sandbox"]["excluded"]["deny"], ["Exec(*)"])
+        argv = s.read_json(task / "turn-02/command.json")["argv"]
+        self.assertIn("--resume", argv)
+        self.assertIn("fixture-session-123", argv)
+
     def test_bracketed_inventory_file_is_snapshot_readable_but_not_writable(self):
         bracketed = self.repo / "src/[id].tsx"
         bracketed.write_text("export const id = '[id]';\n")
