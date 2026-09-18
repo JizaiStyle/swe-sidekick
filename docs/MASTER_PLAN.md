@@ -1,6 +1,6 @@
 # SWE Sidekick Master Plan
 
-Updated: 2026-09-15
+Updated: 2026-09-18
 
 ## Purpose and target state
 
@@ -94,3 +94,13 @@ Clarify how the skill carries existing authorization and task-specific worker ch
 ## MP-22: Publish the verified follow-up changes
 
 Publish the already reviewed MP-20 runtime fix and MP-21 guidance to the existing public `main` without rewriting their commits or importing unrelated history. Keep version 0.3.0 because this repository has no tagged or packaged release and the managed installer explicitly supports backed-up same-version refreshes; a version migration would expand the installer compatibility surface without improving this update. Scope includes focused validation, the MP-21 documentation commit, managed installation refresh, secret scanning, hosted CI, remote-HEAD verification and final roadmap evidence. It excludes new runtime behavior, model execution, task-state changes and unrelated repository cleanup. Completion requires the public remote HEAD and installed managed payloads to match the reviewed source, with MP-20 and MP-21 marked published.
+
+## MP-23: Diagnose failures and resume authorized work
+
+Replace the blanket instruction to abandon a task after any blocked operation with a bounded recovery workflow. An explicit sandbox, approval or command-policy denial stops the affected operation; an ambiguous permission error also stops that operation pending diagnosis. An errno such as EPERM alone does not prove a policy denial or a harmless filesystem limitation. The lead reviews the command, exit status, diagnostic and partial changes, using read-only evidence. Independent authorized work may continue. A supported alternative is allowed only when evidence shows it does not perform a prohibited operation or acquire denied access, and it stays within the original paths, permissions and objective. Preserve partial work and report failed checks separately from later success. An unresolved denial remains blocked; it cannot become success through a different tool, host execution, changed trust or relaxed settings.
+
+Dependency preparation is forbidden by default. A lead-authored packet may explicitly authorize named versions, package-manager commands, approved registry access and scratch-local temporary/cache paths. Such preparation must disable lifecycle scripts, preserve lockfile and integrity policies, and never use credentials or source/host caches. A lockfile-only command that starts linking packages must stop and be reviewed as a failed operation, not silently switch to a full install. Missing dependency authorization is a lead planning issue, not permission to improvise installation. Tool/version-specific help and official documentation inform the next command; a version mismatch is an explicit uncertainty.
+
+The existing validated-session retry limit, immutable packet, clean source, exact model check, reviewed hash and verification gates remain unchanged. Reuse authorization already present in the conversation for a bounded repair; do not manufacture a new approval wait. A changed objective or file scope requires a new packet. No automatic retries, sandbox weakening, state rewriting, package-manager workaround automation or retroactive acceptance of an earlier violation is added.
+
+Ownership: SWE-2 High updates only the generated worker guidance in `swe_sidekick.py` and focused offline regression coverage in `tests/test_sidekick.py`. The lead owns this plan, `docs/ROADMAP.md`, canonical skill, README/security guidance, independent review, managed installation and GitHub publication. Completion requires generated first-run/retry guidance and canonical guidance to agree, unchanged launch/configuration safety boundaries, focused and hosted tests, validated host skill renderings, and the reviewed change merged to GitHub with installed payload hashes verified. Live behavior beyond an observed task is not implied by offline tests.
