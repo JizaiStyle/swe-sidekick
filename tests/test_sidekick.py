@@ -9,6 +9,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -642,6 +643,101 @@ class ProcessTests(Base):
             env = s.environment()
         for key in ("OPENAI_API_KEY", "WINDSURF_API_KEY", "SSH_AUTH_SOCK", "DEVIN_MODEL", "NODE_OPTIONS", "GIT_DIR"):
             self.assertNotIn(key, env)
+
+    def test_cleanup_denial_on_timeout_is_sanitized_and_not_retried(self):
+        with patch.object(s.os, "killpg", side_effect=PermissionError(13, "fixture /private/path detail")) as deny:
+            result = s.bounded_process([sys.executable, "-c", "import time; time.sleep(0.3)"],
+                                       self.root, self.root / "out", self.root / "err", 0.05)
+        self.assertEqual(result["stop"], "timeout")
+        self.assertEqual(deny.call_count, 1)
+        self.assertEqual(deny.call_args.args[1], signal.SIGTERM)
+        cleanup = result["cleanup"]
+        self.assertFalse(cleanup["ok"])
+        self.assertEqual(cleanup["error"], "PermissionError")
+        self.assertEqual(cleanup["errno"], 13)
+        self.assertEqual(cleanup["signal"], "SIGTERM")
+        self.assertEqual(cleanup["termination"], "unconfirmed")
+        self.assertNotIn("private/path", json.dumps(result))
+        self.assertNotIn("time.sleep", json.dumps(cleanup))
+
+    def _run_json(self, *cli):
+        out = io.StringIO()
+        with redirect_stdout(out), redirect_stderr(io.StringIO()):
+            code = s.main(["--state-dir", str(self.state), *map(str, cli)])
+        return code, json.loads(out.getvalue())
+
+    def test_cleanup_denial_on_normal_exit_fails_successful_child(self):
+        self.configure(); task = self.prepare()
+        with patch.object(s.os, "killpg", side_effect=PermissionError(13, "fixture denial")) as deny:
+            code, report = self._run_json("run", "--task", self.task_id)
+        self.assertNotEqual(code, 0)
+        self.assertEqual(deny.call_count, 1)
+        self.assertEqual(report["status"], "worker_failed")
+        state = s.read_json(task / "state.json")
+        self.assertEqual(state["status"], "worker_failed")
+        self.assertFalse(state["interrupted_attempt"])
+        self.assertEqual(len(state["turns"]), 1)
+        turn = state["turns"][0]
+        self.assertEqual(turn["stop"], "exit")
+        self.assertEqual(turn["returncode"], 0)
+        self.assertEqual(turn["model_check"], "matches_requested")
+        self.assertIsInstance(turn["elapsed_seconds"], (int, float))
+        self.assertFalse(turn["cleanup"]["ok"])
+        self.assertEqual(turn["cleanup"]["termination"], "unconfirmed")
+        self.assertNotIn("fixture denial", json.dumps(turn))
+
+    def test_cleanup_denial_on_timeout_records_failed_turn(self):
+        self.configure()
+        cfg = s.read_json(self.state / "config.json")
+        cfg["timeout_seconds"] = 1
+        s.write_json(self.state / "config.json", cfg)
+        self.mode(behavior="timeout")
+        task = self.prepare()
+        with patch.object(s.os, "killpg", side_effect=PermissionError(1, "denied")) as deny:
+            code, report = self._run_json("run", "--task", self.task_id)
+        self.assertNotEqual(code, 0)
+        self.assertEqual(deny.call_count, 1)
+        self.assertEqual(report["status"], "worker_failed")
+        state = s.read_json(task / "state.json")
+        self.assertEqual(state["status"], "worker_failed")
+        self.assertFalse(state["interrupted_attempt"])
+        turn = state["turns"][0]
+        self.assertEqual(turn["stop"], "timeout")
+        self.assertFalse(turn["cleanup"]["ok"])
+        self.assertEqual(turn["cleanup"]["termination"], "unconfirmed")
+
+    def test_cleanup_denial_fails_verification(self):
+        self.packet["verification"] = [[sys.executable, "-c", "pass"],
+                                       [sys.executable, "-c", "raise SystemExit('must not run')"]]
+        self.write_packet()
+        task, _ = self.successful()
+        with patch.object(s.os, "killpg", side_effect=PermissionError(13, "denied")) as deny:
+            code, report = self._run_json("verify", "--task", self.task_id)
+        self.assertNotEqual(code, 0)
+        self.assertEqual(deny.call_count, 1)
+        self.assertFalse(report["verification"]["passed"])
+        self.assertEqual(len(report["verification"]["results"]), 1)
+        result = report["verification"]["results"][0]
+        self.assertEqual(result["stop"], "exit")
+        self.assertEqual(result["returncode"], 0)
+        self.assertFalse(result["cleanup"]["ok"])
+        logs = Path(report["verification"]["logs"])
+        self.assertTrue((logs / "1.stdout.log").exists())
+        self.assertFalse((logs / "2.stdout.log").exists())
+
+    def test_cleanup_succeeds_for_exited_and_missing_groups(self):
+        result = s.bounded_process([sys.executable, "-c", "pass"], self.root,
+                                   self.root / "o", self.root / "e", 5)
+        self.assertEqual(result["stop"], "exit")
+        self.assertEqual(result["returncode"], 0)
+        self.assertEqual(result["cleanup"], {"ok": True})
+
+        proc = subprocess.Popen([sys.executable, "-c", "pass"], start_new_session=True)
+        proc.wait()
+        with patch.object(s.os, "killpg", side_effect=ProcessLookupError) as gone:
+            cleanup = s.kill_group(proc)
+        self.assertEqual(cleanup, {"ok": True})
+        self.assertEqual(gone.call_count, 1)
 
 
 if __name__ == "__main__": unittest.main()

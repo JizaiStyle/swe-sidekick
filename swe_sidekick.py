@@ -848,21 +848,37 @@ DELEGATION PACKET (JSON):
     return text + "\n"
 
 
+def _cleanup_failure(exc, sig):
+    """Sanitized diagnostic only: no argv, paths or arbitrary exception text."""
+    return {"ok": False, "error": type(exc).__name__,
+            "errno": exc.errno if isinstance(exc.errno, int) else None,
+            "signal": sig.name if isinstance(sig, signal.Signals) else None,
+            "termination": "unconfirmed"}
+
+
 def kill_group(proc):
     for sig in (signal.SIGTERM, signal.SIGKILL):
         try:
             os.killpg(proc.pid, sig)
         except ProcessLookupError:
             break
+        except OSError as exc:
+            # A denied/failed signal stops cleanup: no retry, fallback kill or escalation.
+            return _cleanup_failure(exc, sig)
         try:
             proc.wait(timeout=2)
         except subprocess.TimeoutExpired:
             continue
+        except OSError as exc:
+            return _cleanup_failure(exc, None)
         # The group can outlive its leader. The second iteration removes lingering children.
     try:
         proc.wait(timeout=2)
     except subprocess.TimeoutExpired:
         pass
+    except OSError as exc:
+        return _cleanup_failure(exc, None)
+    return {"ok": True}
 
 
 def bounded_process(argv, cwd, stdout_path, stderr_path, timeout):
@@ -883,9 +899,9 @@ def bounded_process(argv, cwd, stdout_path, stderr_path, timeout):
             stop = "interrupted"
         finally:
             code = proc.poll()
-            kill_group(proc)
+            cleanup = kill_group(proc)
     return {"returncode": code if code is not None else -1, "stop": stop,
-            "elapsed_seconds": round(time.monotonic() - start, 3)}
+            "elapsed_seconds": round(time.monotonic() - start, 3), "cleanup": cleanup}
 
 
 def trajectory_info(path, expected):
@@ -974,7 +990,8 @@ def run_task(args, retry=False):
                        "billing_note": "Not measured. Consult Devin usage; a time limit is not a dollar cap."})
         state["turns"].append(result)
         state["interrupted_attempt"] = False
-        state["status"] = "needs_review" if result["returncode"] == 0 and result["stop"] == "exit" else "worker_failed"
+        clean_exit = result["returncode"] == 0 and result["stop"] == "exit" and result["cleanup"]["ok"]
+        state["status"] = "needs_review" if clean_exit else "worker_failed"
         if info["model_check"] in ("mismatch", "session_mismatch"):
             state["status"] = "model_mismatch"
         write_json(task / "state.json", state)
@@ -1008,11 +1025,12 @@ def verify_task(args):
                                      folder / f"{index}.stderr.log", 300)
             result["argv"] = argv
             results.append(result)
-            if result["returncode"] or result["stop"] != "exit":
+            if result["returncode"] or result["stop"] != "exit" or not result["cleanup"]["ok"]:
                 break
         after = inspect_scope(task, state)
         new_patch = build_patch(task, state, after)
-        passed = original == new_patch and all(x["returncode"] == 0 and x["stop"] == "exit" for x in results)
+        passed = original == new_patch and all(
+            x["returncode"] == 0 and x["stop"] == "exit" and x["cleanup"]["ok"] for x in results)
         state["verification"] = {"passed": passed, "patch_sha256": digest(new_patch), "results": results,
                                  "logs": str(folder), "warning": "Tests run as child processes of the caller; this wrapper does not add a sandbox to verification."}
         write_json(task / "state.json", state)

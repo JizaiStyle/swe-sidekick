@@ -64,6 +64,12 @@ linking packages is a failed operation to diagnose, not permission for a full
 install. See [the recovery and dependency rules](skill/SKILL.md#diagnose-before-resuming).
 Failed checks remain recorded separately from later verification success.
 
+If process cleanup is denied, the attempted turn now retains sanitized error
+evidence and marks termination as unconfirmed. A zero child exit is still a
+failed run in this case, and verification stops before the next command.
+No alternate kill path or permission escalation is attempted. Existing
+interrupted task records are not rewritten or retroactively accepted.
+
 ## Change the lead between sections
 
 Yes: finish a section in one host, stop active work, and export a local snapshot:

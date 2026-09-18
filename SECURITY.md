@@ -14,6 +14,7 @@ This is an un-audited, single-user prototype for trusted repositories, not a con
 - Bracketed filenames may be included as read-only snapshot inputs; edits to them remain outside the supported writable scope.
 - Post-run scope/HEAD/refs/logical-index/config/hooks checks. No automatic reset/revert.
 - Per-task advisory lock; explicit session-ID resume; default three-turn cap and 15-minute per-turn timeout; process-group cleanup.
+- Cleanup OS errors stop signaling and produce sanitized failed-turn evidence with unconfirmed termination. Verification stops before its next command; successful child exit alone cannot override cleanup failure. No fallback kill or permission escalation is attempted.
 - Verification tied to the exact patch; explicit reviewed SHA-256 and current source HEAD/clean check before apply. Patch regenerated, not trusted from a saved file.
 - Logs/state live outside the workspace with owner-oriented permissions; no external log upload by this wrapper.
 

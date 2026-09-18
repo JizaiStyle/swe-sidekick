@@ -136,6 +136,14 @@ successful check does not erase it; review and verify the resulting patch
 before acceptance. If recovery is not possible under the current permissions,
 report the remaining blocked operation and continue only independent work.
 
+Process cleanup failures are also failures. A recorded `cleanup.ok: false`
+includes sanitized OS error evidence and `termination: "unconfirmed"`;
+it does not prove the local child or remote inference has stopped. The runner
+stops cleanup on that error, records a failed turn even after a zero child exit,
+and verification does not start another command. Do not retry the denied signal
+through another path. Older interrupted tasks without a recorded, validated
+session remain unaccepted; this change does not repair their state.
+
 ### Dependency preparation
 
 Dependency installation and external access are forbidden by default. When
