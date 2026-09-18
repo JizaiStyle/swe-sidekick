@@ -113,5 +113,8 @@ interrupted task records and validated-session/model gates are unchanged.
   and successful/already-gone process groups.
 
 These are synthetic error-path tests. They neither identify the original OS
-cause nor prove that remote inference stopped. Hosted CI, merge and managed
-installation evidence will be recorded after those steps complete.
+cause nor prove that remote inference stopped. The [hosted Python matrix](https://github.com/JizaiStyle/swe-sidekick/actions/runs/35320870515)
+passed for Python 3.10, 3.12 and 3.14. [PR #2](https://github.com/JizaiStyle/swe-sidekick/pull/2)
+merged at 2026-09-18 07:45:18 UTC (`e821895e0caafd69773b54f5116a1ce742536f7f`).
+The managed installation was refreshed with a backup; all 20 payload hashes
+and file modes matched, including the runtime and both host skill renderings.
